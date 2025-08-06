@@ -20,7 +20,16 @@ int load_pizza_menu(PizzaMenu *menu, const char *filename) {
         int available;
         
         if (sscanf(line, "%49[^,],%lf,%d", name, &price, &available) == 3) {
-            strcpy(menu->pizzas[menu->count].name, name);
+            // Validate parsed data
+            if (price < MIN_PRICE || price > MAX_PRICE) {
+                continue; // Skip invalid price
+            }
+            if (available != 0 && available != 1) {
+                available = 1; // Default to available
+            }
+            
+            strncpy(menu->pizzas[menu->count].name, name, MAX_PIZZA_NAME_LENGTH - 1);
+            menu->pizzas[menu->count].name[MAX_PIZZA_NAME_LENGTH - 1] = '\0';
             menu->pizzas[menu->count].price = price;
             menu->pizzas[menu->count].available = available;
             menu->count++;
@@ -54,13 +63,25 @@ void add_pizza_type(PizzaMenu *menu, const char *name, double price) {
         return;
     }
     
+    // Validate input parameters
+    if (name == NULL || strlen(name) == 0) {
+        printf("Error: Pizza name cannot be empty.\n");
+        return;
+    }
+    
+    if (price < MIN_PRICE || price > MAX_PRICE) {
+        printf("Error: Invalid price (must be €%.2f-€%.2f).\n", MIN_PRICE, MAX_PRICE);
+        return;
+    }
+    
     // Check if pizza already exists
     if (find_pizza_by_name(menu, name) != -1) {
         printf("Error: Pizza type '%s' already exists.\n", name);
         return;
     }
     
-    strcpy(menu->pizzas[menu->count].name, name);
+    strncpy(menu->pizzas[menu->count].name, name, MAX_PIZZA_NAME_LENGTH - 1);
+    menu->pizzas[menu->count].name[MAX_PIZZA_NAME_LENGTH - 1] = '\0';
     menu->pizzas[menu->count].price = price;
     menu->pizzas[menu->count].available = 1;
     menu->count++;

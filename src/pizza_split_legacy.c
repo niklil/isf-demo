@@ -1,12 +1,20 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <errno.h>
+
+#define MAX_PIZZAS 1000
+#define MAX_PEOPLE 1000
 
 int main(int argc, char *argv[]) {
+    long num_pizzas_long;
+    long num_people_long;
     int num_pizzas;
     int num_people;
     double pizza_price = 10.0; // 10€ per pizza
     double total_bill;
     double cost_per_person;
+    char *endptr;
     
     printf("=== Pizza Delivery Bill Splitter ===\n\n");
     
@@ -18,20 +26,22 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     
-    // Parse command line arguments
-    num_pizzas = atoi(argv[1]);
-    num_people = atoi(argv[2]);
-    
-    // Validate inputs
-    if (num_pizzas <= 0) {
-        printf("Error: Number of pizzas must be a positive number.\n");
+    // Parse command line arguments with proper error checking
+    errno = 0;
+    num_pizzas_long = strtol(argv[1], &endptr, 10);
+    if (errno != 0 || *endptr != '\0' || num_pizzas_long <= 0 || num_pizzas_long > MAX_PIZZAS) {
+        printf("Error: Number of pizzas must be a positive integer (1-%d).\n", MAX_PIZZAS);
         return 1;
     }
+    num_pizzas = (int)num_pizzas_long;
     
-    if (num_people <= 0) {
-        printf("Error: Number of people must be a positive number.\n");
+    errno = 0;
+    num_people_long = strtol(argv[2], &endptr, 10);
+    if (errno != 0 || *endptr != '\0' || num_people_long <= 0 || num_people_long > MAX_PEOPLE) {
+        printf("Error: Number of people must be a positive integer (1-%d).\n", MAX_PEOPLE);
         return 1;
     }
+    num_people = (int)num_people_long;
     
     // Calculate the total bill and cost per person
     total_bill = num_pizzas * pizza_price;

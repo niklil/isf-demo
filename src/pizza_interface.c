@@ -4,6 +4,8 @@
 #include "../include/pizza_interface.h"
 #include "../include/pizza_types.h"
 
+#define MENU_FILE_PATH "data/pizza_menu.txt"
+
 void display_main_menu(void) {
     printf("\n=== Pizza Management System ===\n");
     printf("1. Manage Pizza Menu\n");
@@ -35,29 +37,51 @@ void manage_pizza_menu(PizzaMenu *menu) {
             case 2:
                 printf("Enter pizza name: ");
                 clear_input_buffer();
-                fgets(name, sizeof(name), stdin);
-                name[strcspn(name, "\n")] = 0; // Remove newline
+                if (fgets(name, sizeof(name), stdin) == NULL) {
+                    printf("Error: Failed to read input.\n");
+                    break;
+                }
+                name[strcspn(name, "\n")] = '\0'; // Remove newline
+                
+                // Validate pizza name length and content
+                if (strlen(name) == 0) {
+                    printf("Error: Pizza name cannot be empty.\n");
+                    break;
+                }
                 
                 printf("Enter price (€): ");
-                if (scanf("%lf", &price) != 1 || price <= 0) {
-                    printf("Error: Invalid price entered.\n");
+                if (scanf("%lf", &price) != 1 || price < MIN_PRICE || price > MAX_PRICE) {
+                    printf("Error: Invalid price (must be €%.2f-€%.2f).\n", MIN_PRICE, MAX_PRICE);
                     clear_input_buffer();
                     break;
                 }
                 
                 add_pizza_type(menu, name, price);
-                save_pizza_menu(menu, "data/pizza_menu.txt");
+                if (!save_pizza_menu(menu, MENU_FILE_PATH)) {
+                    printf("Warning: Could not save menu to file.\n");
+                }
                 break;
                 
             case 3:
                 display_pizza_menu(menu);
                 printf("Enter pizza name to remove: ");
                 clear_input_buffer();
-                fgets(name, sizeof(name), stdin);
-                name[strcspn(name, "\n")] = 0; // Remove newline
+                if (fgets(name, sizeof(name), stdin) == NULL) {
+                    printf("Error: Failed to read input.\n");
+                    break;
+                }
+                name[strcspn(name, "\n")] = '\0'; // Remove newline
+                
+                // Validate input
+                if (strlen(name) == 0) {
+                    printf("Error: Pizza name cannot be empty.\n");
+                    break;
+                }
                 
                 remove_pizza_type(menu, name);
-                save_pizza_menu(menu, "data/pizza_menu.txt");
+                if (!save_pizza_menu(menu, MENU_FILE_PATH)) {
+                    printf("Warning: Could not save menu to file.\n");
+                }
                 break;
                 
             case 4:
@@ -92,17 +116,25 @@ void create_order(const PizzaMenu *menu, PizzaOrder *order) {
         
         printf("Enter quantity for %s: ", menu->pizzas[pizza_index].name);
         int quantity;
-        if (scanf("%d", &quantity) != 1 || quantity <= 0) {
-            printf("Error: Invalid quantity.\n");
+        if (scanf("%d", &quantity) != 1 || quantity <= 0 || quantity > MAX_QUANTITY) {
+            printf("Error: Invalid quantity (must be 1-%d).\n", MAX_QUANTITY);
             clear_input_buffer();
             continue;
         }
         
-        // Add to order
-        strcpy(order->items[order->item_count].pizza_name, menu->pizzas[pizza_index].name);
+        // Check for potential integer overflow
+        double item_total = quantity * menu->pizzas[pizza_index].price;
+        if (order->total_amount + item_total < order->total_amount) {
+            printf("Error: Order total would overflow. Please reduce quantity.\n");
+            continue;
+        }
+        
+        // Add to order using safe string copy
+        strncpy(order->items[order->item_count].pizza_name, menu->pizzas[pizza_index].name, MAX_PIZZA_NAME_LENGTH - 1);
+        order->items[order->item_count].pizza_name[MAX_PIZZA_NAME_LENGTH - 1] = '\0';
         order->items[order->item_count].quantity = quantity;
         order->items[order->item_count].unit_price = menu->pizzas[pizza_index].price;
-        order->total_amount += quantity * menu->pizzas[pizza_index].price;
+        order->total_amount += item_total;
         order->item_count++;
         
         printf("Added %d x %s to order.\n", quantity, menu->pizzas[pizza_index].name);

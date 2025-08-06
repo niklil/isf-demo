@@ -3,6 +3,9 @@
 
 #define MAX_PIZZA_NAME_LENGTH 50
 #define MAX_PIZZA_TYPES 20
+#define MAX_PRICE 999.99
+#define MIN_PRICE 0.01
+#define MAX_QUANTITY 1000
 
 typedef struct {
     char name[MAX_PIZZA_NAME_LENGTH];
