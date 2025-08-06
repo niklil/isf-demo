@@ -1,0 +1,7 @@
+Margherita,10.00,1
+Pepperoni,12.50,1
+Hawaiian,13.00,1
+Quattro Stagioni,14.50,1
+Vegetarian,11.50,1
+Meat Lovers,16.00,1
+mieli-pide,10.00,1
