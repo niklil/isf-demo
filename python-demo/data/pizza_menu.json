@@ -1,0 +1,32 @@
+[
+  {
+    "name": "Margherita",
+    "price": "10.00",
+    "available": true
+  },
+  {
+    "name": "Pepperoni",
+    "price": "12.50",
+    "available": true
+  },
+  {
+    "name": "Hawaiian",
+    "price": "13.00",
+    "available": true
+  },
+  {
+    "name": "Quattro Stagioni",
+    "price": "14.50",
+    "available": true
+  },
+  {
+    "name": "Vegetarian",
+    "price": "11.50",
+    "available": true
+  },
+  {
+    "name": "Meat Lovers",
+    "price": "16.00",
+    "available": true
+  }
+]

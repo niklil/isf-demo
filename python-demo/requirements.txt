@@ -1,0 +1,15 @@
+# Pizza Management System - Python Requirements
+# This project uses only Python standard library modules
+# No external dependencies required
+
+# Minimum Python version: 3.7
+# Recommended Python version: 3.9+
+
+# Standard library modules used:
+# - json (for data persistence)
+# - os (for file operations)
+# - sys (for system operations)
+# - argparse (for command-line parsing)
+# - decimal (for precise financial calculations)
+# - typing (for type hints)
+# - re (for input validation)
